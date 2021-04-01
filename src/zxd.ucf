@@ -108,9 +108,10 @@ NET sramA<0>    LOC="H14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
 
 # # Joystick ########################################################################################
 # 
-# NET joyD        LOC="T13" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # data
-# NET joyLd       LOC="T12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # load
-# NET joyCk       LOC="R12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # clock
+NET joyD        LOC="T13" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # data
+NET joyLd       LOC="T12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # load
+NET joyCk       LOC="R12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # clock
+NET joySl       LOC="C9" | IOSTANDARD=LVCMOS33 | SLEW=FAST;  # select
 
 # SPI Flash
 
