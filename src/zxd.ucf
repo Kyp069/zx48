@@ -1,0 +1,127 @@
+#
+# ZXDOS+
+#
+
+# Clock ###########################################################################################
+
+NET clock50     LOC="A10" | IOSTANDARD=LVCMOS33 | TNM_NET="clock50";
+TIMESPEC "TS_clock50"=PERIOD "clock50" 20.0 ns HIGH 50%;
+
+# Led #############################################################################################
+
+NET led<1>      LOC="R9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST; # D3
+NET led<0>      LOC="T9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST; # D1
+
+# Video ###########################################################################################
+
+NET sync<1>     LOC="H16" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # VS
+NET sync<0>     LOC="G12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # HS/CS
+
+NET rgb<17>     LOC="G11" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # R<5>
+NET rgb<16>     LOC="F13" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # R<4>
+NET rgb<15>     LOC="F14" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # R<3>
+NET rgb<14>     LOC="G14" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # R<2>
+NET rgb<13>     LOC="G16" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # R<1>
+NET rgb<12>     LOC="H15" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # R<0>
+NET rgb<11>     LOC="B16" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # G<5>
+NET rgb<10>     LOC="C16" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # G<4>
+NET rgb<9>      LOC="D16" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # G<3>
+NET rgb<8>      LOC="E16" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # G<2>
+NET rgb<7>      LOC="F16" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # G<1>
+NET rgb<6>      LOC="F12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # G<0>
+NET rgb<5>      LOC="E12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # B<5>
+NET rgb<4>      LOC="B15" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # B<4>
+NET rgb<3>      LOC="C15" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # B<3>
+NET rgb<2>      LOC="D14" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # B<2>
+NET rgb<1>      LOC="E15" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # B<1>
+NET rgb<0>      LOC="F15" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # B<0>
+
+# Audio ###########################################################################################
+
+NET ear         LOC="A14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+
+NET audio<1>    LOC="H13" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # right
+NET audio<0>    LOC="H11" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # left
+
+# PS/2 ############################################################################################
+
+NET keyb<1>     LOC="P12" | IOSTANDARD=LVCMOS33 | SLEW=FAST | PULLUP; # data
+NET keyb<0>     LOC="M11" | IOSTANDARD=LVCMOS33 | SLEW=FAST | PULLUP; # clock
+
+#ET mouse<1>    LOC="P11" | IOSTANDARD=LVCMOS33 | SLEW=FAST | PULLUP; # data
+#ET mouse<0>    LOC="M10" | IOSTANDARD=LVCMOS33 | SLEW=FAST | PULLUP; # clock
+
+# uSD #############################################################################################
+
+NET usdCs       LOC="N9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET usdCk       LOC="T6"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET usdMiso     LOC="T7"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET usdMosi     LOC="M9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+
+# SRAM ############################################################################################
+
+NET sramWe      LOC="M16" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramOe      LOC="C7"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramUb      LOC="E13" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramLb      LOC="C11" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+
+NET sramDQ<15>  LOC="R5"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<14>  LOC="N8"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<13>  LOC="N6"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<12>  LOC="F7"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<11>  LOC="D6"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<10>  LOC="P9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<9>   LOC="T4"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<8>   LOC="T5"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<7>   LOC="R15" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<6>   LOC="P16" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<5>   LOC="P15" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<4>   LOC="J14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<3>   LOC="K12" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<2>   LOC="L16" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<1>   LOC="N16" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramDQ<0>   LOC="K15" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+
+NET sramA<20>   LOC="A12" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<19>   LOC="F10" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<18>   LOC="R16" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<17>   LOC="R14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<16>   LOC="T15" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<15>   LOC="T14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<14>   LOC="J12" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<13>   LOC="L13" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<12>   LOC="K14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<11>   LOC="M14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<10>   LOC="L14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<9>    LOC="N14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<8>    LOC="M15" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<7>    LOC="M13" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<6>    LOC="L12" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<5>    LOC="K11" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<4>    LOC="K16" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<3>    LOC="J13" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<2>    LOC="J11" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<1>    LOC="J16" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+NET sramA<0>    LOC="H14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+
+###################################################################################################
+
+# # Joystick ########################################################################################
+# 
+# NET joyD        LOC="T13" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # data
+# NET joyLd       LOC="T12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # load
+# NET joyCk       LOC="R12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # clock
+
+# SPI Flash
+
+# NET flashCs   LOC="T3"  | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+# NET flashCk   LOC="R11" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+# NET flashMosi LOC="T10" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
+# NET flashMiso LOC="P10" | IOSTANDARD=LVCMOS33 | SLEW=FAST | PULLUP;
+
+# Buttons
+
+# NET button<1>   LOC="R7"  | IOSTANDARD = LVCMOS33; # SW3
+# NET button<0>   LOC="T8"  | IOSTANDARD = LVCMOS33; # SW2
+
+###################################################################################################
