@@ -39,6 +39,11 @@ module zx48
 	input  wire[ 1:0] keyb,
 `ifdef ZX1
 	input  wire[ 5:0] joys,
+`elsif ZXD
+   input  wire joyD,  //data
+   output wire joyLd, //load
+   output wire joyCk, //clock
+   input  wire joySl, //select   
 `endif
 
 	output wire       usdCs,
@@ -72,12 +77,22 @@ module zx48
 );
 //-------------------------------------------------------------------------------------------------
 
+`ifdef ZXD
+clock Clock
+(
+	.i50    (clock50),
+	.o56    (clock  ),
+   .o16    (clock16),
+	.locked (locked )
+);
+`else
 clock Clock
 (
 	.i50    (clock50),
 	.o56    (clock  ),
 	.locked (locked )
 );
+`endif
 
 reg[3:0] ce;
 always @(negedge clock) if(locked) ce <= ce+1'd1;
@@ -331,7 +346,23 @@ turbosound Turbosound
 `ifdef ZX2
 wire[5:0] joys = 6'b111111;
 `elsif ZXD
-wire[5:0] joys = 6'b111111;
+//wire[5:0] joys = 6'b111111;
+wire [11:0] joy1_aux; //lx25
+wire [11:0] joy2_aux; //lx25
+wire[ 5:0] joys;       //Core joystick
+
+joydecoder joysticks (
+   .clk(clock16),
+   .joy_data(joyD),
+   .joy_clk(joyCk),
+   .joy_load_n(joyLd),
+   .reset(~reset),
+   .hsync_n_s(hsyncaux),
+   .joy1_o(joy1_aux), // -- MXYZ SACB RLDU  Negative Logic
+   .joy2_o(joy2_aux)  // -- MXYZ SACB RLDU  Negative Logic
+);
+assign joySl = hsyncaux;
+assign joys = { joy1_aux[5:4], joy1_aux[0], joy1_aux[1], joy1_aux[2], joy1_aux[3] } ;
 `endif
 
 //-------------------------------------------------------------------------------------------------
@@ -361,20 +392,21 @@ assign led = { 1'b1, usdCs };
 `endif
 
 //-------------------------------------------------------------------------------------------------
+assign hsyncaux = ~(hsync^vsync);
 
 `ifdef ZX1
 assign stdn = 2'b01; // PAL
-assign sync = ~(hsync^vsync);
+assign sync = { 1'b1, hsyncaux };
 assign rgb = blank ? 9'd0 : { r,r&i,r, g,g&i,g, b,b&i,b };
 `elsif ZX2
 reg[17:0] palette[15:0];
 initial $readmemh("palette.hex", palette, 0);
-assign sync = ~(hsync^vsync);
+assign sync = { 1'b1, hsyncaux };
 assign rgb = blank ? 18'd0 : palette[{ i, r, g, b }];
 `elsif ZXD
 reg[17:0] palette[15:0];
 initial $readmemh("palette.hex", palette, 0);
-assign sync = ~(hsync^vsync);
+assign sync = { 1'b1, hsyncaux };
 assign rgb = blank ? 18'd0 : palette[{ i, r, g, b }];
 `endif
 
