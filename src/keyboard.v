@@ -8,6 +8,7 @@ module keyboard
 	output wire      f12,
 	output wire      f11,
 	output wire      f5,
+   output wire      modovideo,
 	output wire[4:0] q,
 	input  wire[7:0] a
 );
@@ -84,6 +85,7 @@ reg pressed = 1'b0;
 reg F5;  // nmi
 reg F11; // boot
 reg F12; // reset
+reg SCRLK; //modo vídeo
 
 reg alt;
 reg del;
@@ -96,6 +98,7 @@ begin
 	F5 = 1'b1;
 	F11 = 1'b1;
 	F12 = 1'b1;
+   SCRLK = 1'b1;
 
 	alt = 1'b1;
 	del = 1'b1;
@@ -189,6 +192,8 @@ if(received)
 			8'h03: F5  <= pressed;
 			8'h78: F11 <= pressed;
 			8'h07: F12 <= pressed;
+         8'h7e: SCRLK <= pressed;
+         
 		endcase
 	end
 
@@ -208,6 +213,7 @@ wire ctrl = key[7][1];
 assign f5 = F5;
 assign f11 = F11 && (ctrl|alt|bs);
 assign f12 = F12 && (ctrl|alt|del);
+assign modovideo = SCRLK;
 
 //-------------------------------------------------------------------------------------------------
 endmodule

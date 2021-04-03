@@ -4,7 +4,8 @@ module clock
 (
 	input  wire i50,   // 50.000 MHz
 	output wire o56,   // 56.000 MHz
-	output wire o16,   // 16.666 MHz	
+	output wire o16,   // 16.666 MHz
+   output wire o50,   // 50.000 MHz	
 	output wire locked
 );
 //-------------------------------------------------------------------------------------------------
@@ -59,6 +60,7 @@ always @(posedge ci) begin
 end
 
 BUFG bufgO16(.I(ce_16m), .O(o16));
+BUFG bufgO50(.I(ci), .O(o50));
 
 //-------------------------------------------------------------------------------------------------
 endmodule
