@@ -39,6 +39,10 @@ module zx48
 	input  wire[ 1:0] keyb,
 `ifdef ZX1
 	input  wire[ 5:0] joys,
+`elsif ZX2
+   input  wire joyD,  //data
+   output wire joyLd, //load
+   output wire joyCk, //clock
 `elsif ZXD
    input  wire joyD,  //data
    output wire joyLd, //load
@@ -59,11 +63,24 @@ module zx48
 	output wire       i2s_data_o,
 `endif
 
+`ifdef ZXD
+	// I2S -- Compartido con PI0
+   //output wire i2s_mclk_o,
+	output wire       i2s_bclk_o,
+	output wire       i2s_lrclk_o,
+	output wire       i2s_data_o,
+`endif
+
 `ifdef ZX1
 	output wire       sramWe,
 	inout  wire[ 7:0] sramDQ,
 	output wire[20:0] sramA
 `elsif ZX2
+	//SRAM for BIOS configuration
+   output wire       sramWe,
+	inout  wire[ 7:0] sramDQ,
+	output wire[18:0] sramA,
+   //SDRAM for main core
 	output wire       sdramCk,
 	output wire       sdramCe,
 	output wire       sdramCs,
@@ -85,23 +102,16 @@ module zx48
 );
 //-------------------------------------------------------------------------------------------------
 
-`ifdef ZXD
 clock Clock
 (
 	.i50    (clock50),
 	.o56    (clock  ),
+`ifdef ZXD
    .o16    (clock16),
    .o50    (clock50s),
-	.locked (locked )
-);
-`else
-clock Clock
-(
-	.i50    (clock50),
-	.o56    (clock  ),
-	.locked (locked )
-);
 `endif
+	.locked (locked )
+);
 
 reg[3:0] ce;
 always @(negedge clock) if(locked) ce <= ce+1'd1;
@@ -196,24 +206,29 @@ memory Memory
 	.vduCe  (ce7M0n ),
 	.vduQ   (vduQ   ),
 	.vduA   (vduA   ),
+   .scndbl  (scndl_r ),
 `ifdef ZX1
    .scndbl  (scndl_r ),
 	.sramWe  (sramWe  ),
 	.sramDQ  (sramDQ  ),
 	.sramA   (sramA   )
 `elsif ZX2
-	.sdramCk (sdramCk ),
-	.sdramCe (sdramCe ),
-	.sdramCs (sdramCs ),
-	.sdramWe (sdramWe ),
-	.sdramRas(sdramRas),
-	.sdramCas(sdramCas),
-	.sdramDQM(sdramDQM),
-	.sdramDQ (sdramDQ ),
-	.sdramBA (sdramBA ),
-	.sdramA  (sdramA  )
+	//BIOS default configuration
+   .sramWe  (sramWe  ),
+	.sramDQ  (sramDQ  ),
+	.sramA   (sramA   )
+//   //MAIN use
+//	.sdramCk (sdramCk ),
+//	.sdramCe (sdramCe ),
+//	.sdramCs (sdramCs ),
+//	.sdramWe (sdramWe ),
+//	.sdramRas(sdramRas),
+//	.sdramCas(sdramCas),
+//	.sdramDQM(sdramDQM),
+//	.sdramDQ (sdramDQ ),
+//	.sdramBA (sdramBA ),
+//	.sdramA  (sdramA  )
 `elsif ZXD
-   .scndbl  (scndl_r ),
 	.sramOe  (sramOe  ),
 	.sramWe  (sramWe  ),
 	.sramUb  (sramUb  ),
@@ -280,6 +295,43 @@ assign vduVs = vsync;
 
 assign sync[0] = hsyncaux;
 
+
+
+reg clk28 = 1'b0;
+always @(posedge clock) clk28 = ~ clk28;
+
+reg scandoubler_disable = 1'b0;
+reg keyMv_prev = 1'b1;
+always @(posedge clock) begin
+   keyMv_prev <= keyModovideo;
+   if (!power) scandoubler_disable <= ~scndl_r[0];
+   else if (keyMv_prev == 1'b0 && keyModovideo == 1'b1) 
+      scandoubler_disable <= ~scandoubler_disable;
+end
+
+wire [17:0] vduRGB, rgbSD;
+
+zxuno_video zxunoVideo
+(
+	.clk_sys     (clk28    ),
+	.scanlines   (2'b00),
+	.ce_divider  (1'b0       ),
+	.R           (vduRGB[17:12]),
+	.G           (vduRGB[11: 6]),
+	.B           (vduRGB[ 5: 0]),
+	.HSync       (~vduHs     ),
+	.VSync       (~vduVs     ),
+	.VGA_R       (rgbSD[17:12] ),
+	.VGA_G       (rgbSD[11: 6] ),
+	.VGA_B       (rgbSD[ 5: 0] ),
+	.VGA_VS      (sync[1]    ),
+	.VGA_HS      (hsyncaux    ),
+	.scandoubler_disable(scandoubler_disable)
+);
+assign vduHs = hsync;
+assign vduVs = vsync;
+
+assign sync[0] = hsyncaux;
 
 
 //-------------------------------------------------------------------------------------------------
@@ -418,7 +470,22 @@ turbosound Turbosound
 //-------------------------------------------------------------------------------------------------
 
 `ifdef ZX2
-wire[5:0] joys = 6'b111111;
+//wire[5:0] joys = 6'b111111;
+wire [7:0] joy1_aux; //lx16
+wire [7:0] joy2_aux; //lx16
+wire[ 5:0] joys;       //Core joystick
+
+joydecoder joysticks (
+   .clk(ce7M0p),
+   .joy_data(joyD),
+   .joy_clk(joyCk),
+   .joy_load(joyLd),
+   .reset_n(reset),
+   .hsync_n_s(hsyncaux),
+   .joy1_o(joy1_aux), // -- SACB RLDU  Negative Logic
+   .joy2_o(joy2_aux)  // -- SACB RLDU  Negative Logic
+);
+assign joys = { joy1_aux[5:4], joy1_aux[0], joy1_aux[1], joy1_aux[2], joy1_aux[3] } ;
 `elsif ZXD
 //wire[5:0] joys = 6'b111111;
 wire [11:0] joy1_aux; //lx25
@@ -486,6 +553,13 @@ initial $readmemh("palette.hex", palette, 0);
 assign vduRGB = blank ? 18'd0 : palette[{ i, r, g, b }];
 assign rgb = rgbSD;
 `endif
+
+
+//------------multiboot---------------
+multiboot multiboot_i  (
+   .clk_icap(clk28    ),
+   .REBOOT  (~keyF11   )
+);
 
 
 //------------multiboot---------------
