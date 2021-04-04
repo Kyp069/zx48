@@ -63,6 +63,14 @@ module zx48
 	output wire       i2s_data_o,
 `endif
 
+`ifdef ZXD
+	// I2S -- Compartido con PI0
+   //output wire i2s_mclk_o,
+	output wire       i2s_bclk_o,
+	output wire       i2s_lrclk_o,
+	output wire       i2s_data_o,
+`endif
+
 `ifdef ZX1
 	output wire       sramWe,
 	inout  wire[ 7:0] sramDQ,
@@ -200,6 +208,7 @@ memory Memory
 	.vduA   (vduA   ),
    .scndbl  (scndl_r ),
 `ifdef ZX1
+   .scndbl  (scndl_r ),
 	.sramWe  (sramWe  ),
 	.sramDQ  (sramDQ  ),
 	.sramA   (sramA   )
@@ -249,6 +258,44 @@ video Video
 	.d      (vduQ   ),
 	.a      (vduA   )
 );
+
+reg clk28 = 1'b0;
+always @(posedge clock) clk28 = ~ clk28;
+
+reg scandoubler_disable = 1'b0;
+reg keyMv_prev = 1'b1;
+always @(posedge clock) begin
+   keyMv_prev <= keyModovideo;
+   if (!power) scandoubler_disable <= ~scndl_r[0];
+   else if (keyMv_prev == 1'b0 && keyModovideo == 1'b1) 
+      scandoubler_disable <= ~scandoubler_disable;
+end
+
+wire [17:0] vduRGB, rgbSD;
+
+zxuno_video zxunoVideo
+(
+	.clk_sys     (clk28    ),
+	.scanlines   (2'b00),
+	.ce_divider  (1'b0       ),
+	.R           (vduRGB[17:12]),
+	.G           (vduRGB[11: 6]),
+	.B           (vduRGB[ 5: 0]),
+	.HSync       (~vduHs     ),
+	.VSync       (~vduVs     ),
+	.VGA_R       (rgbSD[17:12] ),
+	.VGA_G       (rgbSD[11: 6] ),
+	.VGA_B       (rgbSD[ 5: 0] ),
+	.VGA_VS      (sync[1]    ),
+	.VGA_HS      (hsyncaux    ),
+	.scandoubler_disable(scandoubler_disable)
+);
+assign vduHs = hsync;
+assign vduVs = vsync;
+
+assign sync[0] = hsyncaux;
+
+
 
 reg clk28 = 1'b0;
 always @(posedge clock) clk28 = ~ clk28;
@@ -506,6 +553,13 @@ initial $readmemh("palette.hex", palette, 0);
 assign vduRGB = blank ? 18'd0 : palette[{ i, r, g, b }];
 assign rgb = rgbSD;
 `endif
+
+
+//------------multiboot---------------
+multiboot multiboot_i  (
+   .clk_icap(clk28    ),
+   .REBOOT  (~keyF11   )
+);
 
 
 //------------multiboot---------------

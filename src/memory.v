@@ -25,6 +25,7 @@ module memory
    output wire[1:0]  scndbl,   //configuración de bios de scandoubler 
 
 `ifdef ZX1
+   output wire[1:0]  scndbl,   //configuración de bios de scandoubler 
 	output wire       sramWe,
 	inout  wire[ 7:0] sramDQ,
 	output wire[20:0] sramA
