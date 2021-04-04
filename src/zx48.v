@@ -39,6 +39,10 @@ module zx48
 	input  wire[ 1:0] keyb,
 `ifdef ZX1
 	input  wire[ 5:0] joys,
+`elsif ZX2
+   input  wire joyD,  //data
+   output wire joyLd, //load
+   output wire joyCk, //clock
 `elsif ZXD
    input  wire joyD,  //data
    output wire joyLd, //load
@@ -64,6 +68,11 @@ module zx48
 	inout  wire[ 7:0] sramDQ,
 	output wire[20:0] sramA
 `elsif ZX2
+	//SRAM for BIOS configuration
+   output wire       sramWe,
+	inout  wire[ 7:0] sramDQ,
+	output wire[18:0] sramA,
+   //SDRAM for main core
 	output wire       sdramCk,
 	output wire       sdramCe,
 	output wire       sdramCs,
@@ -85,23 +94,16 @@ module zx48
 );
 //-------------------------------------------------------------------------------------------------
 
-`ifdef ZXD
 clock Clock
 (
 	.i50    (clock50),
 	.o56    (clock  ),
+`ifdef ZXD
    .o16    (clock16),
    .o50    (clock50s),
-	.locked (locked )
-);
-`else
-clock Clock
-(
-	.i50    (clock50),
-	.o56    (clock  ),
-	.locked (locked )
-);
 `endif
+	.locked (locked )
+);
 
 reg[3:0] ce;
 always @(negedge clock) if(locked) ce <= ce+1'd1;
@@ -196,24 +198,28 @@ memory Memory
 	.vduCe  (ce7M0n ),
 	.vduQ   (vduQ   ),
 	.vduA   (vduA   ),
-`ifdef ZX1
    .scndbl  (scndl_r ),
+`ifdef ZX1
 	.sramWe  (sramWe  ),
 	.sramDQ  (sramDQ  ),
 	.sramA   (sramA   )
 `elsif ZX2
-	.sdramCk (sdramCk ),
-	.sdramCe (sdramCe ),
-	.sdramCs (sdramCs ),
-	.sdramWe (sdramWe ),
-	.sdramRas(sdramRas),
-	.sdramCas(sdramCas),
-	.sdramDQM(sdramDQM),
-	.sdramDQ (sdramDQ ),
-	.sdramBA (sdramBA ),
-	.sdramA  (sdramA  )
+	//BIOS default configuration
+   .sramWe  (sramWe  ),
+	.sramDQ  (sramDQ  ),
+	.sramA   (sramA   )
+//   //MAIN use
+//	.sdramCk (sdramCk ),
+//	.sdramCe (sdramCe ),
+//	.sdramCs (sdramCs ),
+//	.sdramWe (sdramWe ),
+//	.sdramRas(sdramRas),
+//	.sdramCas(sdramCas),
+//	.sdramDQM(sdramDQM),
+//	.sdramDQ (sdramDQ ),
+//	.sdramBA (sdramBA ),
+//	.sdramA  (sdramA  )
 `elsif ZXD
-   .scndbl  (scndl_r ),
 	.sramOe  (sramOe  ),
 	.sramWe  (sramWe  ),
 	.sramUb  (sramUb  ),
@@ -279,7 +285,6 @@ assign vduHs = hsync;
 assign vduVs = vsync;
 
 assign sync[0] = hsyncaux;
-
 
 
 //-------------------------------------------------------------------------------------------------
@@ -418,7 +423,22 @@ turbosound Turbosound
 //-------------------------------------------------------------------------------------------------
 
 `ifdef ZX2
-wire[5:0] joys = 6'b111111;
+//wire[5:0] joys = 6'b111111;
+wire [7:0] joy1_aux; //lx16
+wire [7:0] joy2_aux; //lx16
+wire[ 5:0] joys;       //Core joystick
+
+joydecoder joysticks (
+   .clk(ce7M0p),
+   .joy_data(joyD),
+   .joy_clk(joyCk),
+   .joy_load(joyLd),
+   .reset_n(reset),
+   .hsync_n_s(hsyncaux),
+   .joy1_o(joy1_aux), // -- SACB RLDU  Negative Logic
+   .joy2_o(joy2_aux)  // -- SACB RLDU  Negative Logic
+);
+assign joys = { joy1_aux[5:4], joy1_aux[0], joy1_aux[1], joy1_aux[2], joy1_aux[3] } ;
 `elsif ZXD
 //wire[5:0] joys = 6'b111111;
 wire [11:0] joy1_aux; //lx25

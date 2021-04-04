@@ -22,25 +22,29 @@ module memory
 	input  wire       vduCe,
 	output wire[ 7:0] vduQ,
 	input  wire[12:0] vduA,
+   output wire[1:0]  scndbl,   //configuración de bios de scandoubler 
 
 `ifdef ZX1
-   output wire[1:0]  scndbl,   //configuración de bios de scandoubler 
 	output wire       sramWe,
 	inout  wire[ 7:0] sramDQ,
 	output wire[20:0] sramA
 `elsif ZX2
-	output wire       sdramCk,
-	output wire       sdramCe,
-	output wire       sdramCs,
-	output wire       sdramWe,
-	output wire       sdramCas,
-	output wire       sdramRas,
-	output wire[ 1:0] sdramDQM,
-	inout  wire[15:0] sdramDQ,
-	output wire[ 1:0] sdramBA,
-	output wire[12:0] sdramA
+	//BIOS default configuration
+   output wire       sramWe,
+	inout  wire[ 7:0] sramDQ,
+	output wire[18:0] sramA
+//   //Main use
+//	output wire       sdramCk,
+//	output wire       sdramCe,
+//	output wire       sdramCs,
+//	output wire       sdramWe,
+//	output wire       sdramCas,
+//	output wire       sdramRas,
+//	output wire[ 1:0] sdramDQM,
+//	inout  wire[15:0] sdramDQ,
+//	output wire[ 1:0] sdramBA,
+//	output wire[12:0] sdramA
 `elsif ZXD
-   output wire[1:0]  scndbl,   //configuración de bios de scandoubler 
 	output wire       sramOe,
 	output wire       sramWe,
 	output wire       sramUb,
@@ -142,7 +146,6 @@ dprs #(.KB(8)) Dpr
 );
 
 //-------------------------------------------------------------------------------------------------
-
 `ifdef ZX1
 assign ready = power;
 assign sramWe = !(!mreq && !wr && (a[15] || a[14] || (a[13] && map)));
@@ -150,40 +153,51 @@ assign sramDQ = sramWe ? 8'hZZ : d;
 assign sramA = power ? { 2'b00, a[15:14] == 2'b00 && map ? { 1'b1, page, a[12:0] } : { 2'b00, a } }
                : 21'h08FD5 ; //magic place where the scandoubler settings have been stored
 assign q = a[15:13] == 3'b000 && map && !mapram ? esxQ : a[15:14] == 2'b00 && !map ? romQ : sramDQ;
-reg [7:0] scandbl_setting;
-always @(posedge clock) if (!power) scandbl_setting <= sramDQ;
-assign scndbl = scandbl_setting[1:0];
 `elsif ZX2
-wire sdrWe = !(!mreq && !wr && (a[15] || a[14] || (a[13] && map)));
-wire sdrRd = !(!mreq && !rd && (a[15] || a[14] || map));
+assign ready = power;
+assign sramWe = !(!mreq && !wr && (a[15] || a[14] || (a[13] && map)));
+assign sramDQ = sramWe ? 8'hZZ : d;
+assign sramA = power ? { a[15:14] == 2'b00 && map ? { 1'b1, page, a[12:0] } : { 2'b00, a } }
+               : 19'h08FD5 ; //magic place where the scandoubler settings have been stored
+assign q = a[15:13] == 3'b000 && map && !mapram ? esxQ : a[15:14] == 2'b00 && !map ? romQ : sramDQ;
 
-wire[15:0] sdrD = { 8'h00, d };
-wire[15:0] sdrQ;
-wire[23:0] sdrA = { 6'h00, a[15:14] == 2'b00 && map ? { 1'b1, page, a[12:0] } : { 2'b00, a } };
 
-sdram Ram
-(
-	.clock   (clock   ),
-	.power   (power   ),
-	.ready   (ready   ),
-	.rfsh    (rfsh    ),
-	.wr      (sdrWe   ),
-	.rd      (sdrRd   ),
-	.d       (sdrD    ),
-	.q       (sdrQ    ),
-	.a       (sdrA    ),
-	.sdramCk (sdramCk ),
-	.sdramCe (sdramCe ),
-	.sdramCs (sdramCs ),
-	.sdramWe (sdramWe ),
-	.sdramRas(sdramRas),
-	.sdramCas(sdramCas),
-	.sdramDQM(sdramDQM),
-	.sdramDQ (sdramDQ ),
-	.sdramBA (sdramBA ),
-	.sdramA  (sdramA  )
-);
-assign q = a[15:13] == 3'b000 && map && !mapram ? esxQ : a[15:14] == 2'b00 && !map ? romQ : sdrQ[7:0];
+////SRAM for BIOS default value load
+//assign sramWe = 1'b1;
+//assign sramDQ = 8'hZZ;
+//assign sramA  = 19'h08FD5 ; //magic place where the scandoubler settings have been stored
+//
+////SDRAM main memory
+//wire sdrWe = !(!mreq && !wr && (a[15] || a[14] || (a[13] && map)));
+//wire sdrRd = !(!mreq && !rd && (a[15] || a[14] || map));
+//
+//wire[15:0] sdrD = { 8'hFF, d };
+//wire[15:0] sdrQ;
+//wire[23:0] sdrA = { 6'h00, a[15:14] == 2'b00 && map ? { 1'b1, page, a[12:0] } : { 2'b00, a } };
+//
+//sdram Ram
+//(
+//	.clock   (clock   ),
+//	.power   (power   ),
+//	.ready   (ready   ),
+//	.rfsh    (rfsh    ),
+//	.wr      (sdrWe   ),
+//	.rd      (sdrRd   ),
+//	.d       (sdrD    ),
+//	.q       (sdrQ    ),
+//	.a       (sdrA    ),
+//	.sdramCk (sdramCk ),
+//	.sdramCe (sdramCe ),
+//	.sdramCs (sdramCs ),
+//	.sdramWe (sdramWe ),
+//	.sdramRas(sdramRas),
+//	.sdramCas(sdramCas),
+//	.sdramDQM(sdramDQM),
+//	.sdramDQ (sdramDQ ),
+//	.sdramBA (sdramBA ),
+//	.sdramA  (sdramA  )
+//);
+//assign q = a[15:13] == 3'b000 && map && !mapram ? esxQ : a[15:14] == 2'b00 && !map ? romQ : sdrQ[7:0];
 `elsif ZXD
 assign ready = power;
 assign sramOe = 1'b0;
@@ -195,10 +209,12 @@ assign sramDQ = sramWe ? 16'hZZZZ : { 8'hFF, d };
 assign sramA = power ? { 2'b00, a[15:14] == 2'b00 && map ? { 1'b1, page, a[12:0] } : { 2'b00, a } }
                : 21'h08FD5 ; //magic place where the scandoubler settings have been stored
 assign q = a[15:13] == 3'b000 && map && !mapram ? esxQ : a[15:14] == 2'b00 && !map ? romQ : sramDQ[7:0];
+`endif
+
+//BIOS default value load
 reg [7:0] scandbl_setting;
 always @(posedge clock) if (!power) scandbl_setting <= sramDQ[7:0];
 assign scndbl = scandbl_setting[1:0];
-`endif
 
 //-------------------------------------------------------------------------------------------------
 endmodule
