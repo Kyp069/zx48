@@ -69,10 +69,31 @@ audio_top	i2s
    .dac_LRCK  (i2s_lc ), //i2s_lrclk_s,
    .dac_SCLK  (i2s_bc ), //i2s_bclk_s,
    .dac_SDIN  (i2s_dt ), //i2s_data_s,
-   .L_data    ( { ldacD , 6'b000000 } ), // zxn_audio_L_pre & "000", --'0' & zxn_audio_L_pre & "00",
-   .R_data    ( { rdacD , 6'b000000 } ) //zxn_audio_R_pre & "000"  --'0' & zxn_audio_R_pre & "00"	
+   .L_data    ( { ldacD , 6'b0 } ), // zxn_audio_L_pre & "000", --'0' & zxn_audio_L_pre & "00",
+   .R_data    ( { rdacD , 6'b0 } ) //zxn_audio_R_pre & "000"  --'0' & zxn_audio_R_pre & "00"	
 ); 
 
+//reg clk14 = 1'b0;
+//always @(posedge clock) clk14 <= ~clk14;
+//
+//
+//// Instacia I2S audio
+//i2s_transmitter #(
+//   .mclk_rate(14000000),
+//   .sample_rate(54687),
+//   .preamble(0),
+//   .word_length(16)
+//) i2s (
+//		.clock_i			(clk14  ), // 56.000 MHz (2xMCLK)
+//		.reset_i			(~reset  ),
+//		// Parallel input
+//		.pcm_l_i			( { ldacD , 6'b0 } ),
+//		.pcm_r_i			( { rdacD , 6'b0 } ),
+//		.i2s_mclk_o    (       ),
+//		.i2s_lrclk_o	(i2s_lc ),
+//		.i2s_bclk_o		(i2s_bc ),
+//		.i2s_d_o			(i2s_dt )
+//);
 
 //-------------------------------------------------------------------------------------------------
 endmodule

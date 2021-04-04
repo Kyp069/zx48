@@ -43,12 +43,13 @@ Dcm
 );
 
 BUFGCE_1 Bufgce(.I(co), .O(o56), .CE(locked));
+BUFG bufgO50(.I(ci), .O(o50));
 
 // clock 16,66Mhz
 reg ce_16m;
 reg [1:0] div3 = 2'b0;
 
-always @(posedge ci) begin
+always @(posedge o50) begin
    if (div3 == 2'b10) begin
       div3 <= 2'b0;
       ce_16m <= 1'b1;
@@ -60,7 +61,6 @@ always @(posedge ci) begin
 end
 
 BUFG bufgO16(.I(ce_16m), .O(o16));
-BUFG bufgO50(.I(ci), .O(o50));
 
 //-------------------------------------------------------------------------------------------------
 endmodule
