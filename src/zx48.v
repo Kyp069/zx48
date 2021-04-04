@@ -51,6 +51,14 @@ module zx48
 	input  wire       usdMiso,
 	output wire       usdMosi,
 
+`ifdef ZXD
+	// I2S -- Compartido con PI0
+   //output wire i2s_mclk_o,
+	output wire       i2s_bclk_o,
+	output wire       i2s_lrclk_o,
+	output wire       i2s_data_o,
+`endif
+
 `ifdef ZX1
 	output wire       sramWe,
 	inout  wire[ 7:0] sramDQ,
@@ -83,6 +91,7 @@ clock Clock
 	.i50    (clock50),
 	.o56    (clock  ),
    .o16    (clock16),
+   .o50    (clock50s),
 	.locked (locked )
 );
 `else
@@ -118,7 +127,7 @@ wire cc3M5n = ce3M5n & contend;
 
 //-------------------------------------------------------------------------------------------------
 
-reg[5:0] rs;
+reg[5:0] rs = 6'b0;
 wire power = rs[5];
 always @(posedge clock) if(cc3M5p) if(!power) rs <= rs+1'd1;
 
@@ -166,6 +175,7 @@ always @(posedge clock) if(ce7M0n) if(!ioFE && !wr) { speaker, mic, border } <= 
 wire[ 7:0] memQ;
 wire[ 7:0] vduQ;
 wire[12:0] vduA;
+wire[1:0] scndl_r; //valores bios de scandoubler
 
 memory Memory
 (
@@ -187,6 +197,7 @@ memory Memory
 	.vduQ   (vduQ   ),
 	.vduA   (vduA   ),
 `ifdef ZX1
+   .scndbl  (scndl_r ),
 	.sramWe  (sramWe  ),
 	.sramDQ  (sramDQ  ),
 	.sramA   (sramA   )
@@ -202,6 +213,7 @@ memory Memory
 	.sdramBA (sdramBA ),
 	.sdramA  (sdramA  )
 `elsif ZXD
+   .scndbl  (scndl_r ),
 	.sramOe  (sramOe  ),
 	.sramWe  (sramWe  ),
 	.sramUb  (sramUb  ),
@@ -232,6 +244,44 @@ video Video
 	.a      (vduA   )
 );
 
+reg clk28 = 1'b0;
+always @(posedge clock) clk28 = ~ clk28;
+
+reg scandoubler_disable = 1'b0;
+reg keyMv_prev = 1'b1;
+always @(posedge clock) begin
+   keyMv_prev <= keyModovideo;
+   if (!power) scandoubler_disable <= ~scndl_r[0];
+   else if (keyMv_prev == 1'b0 && keyModovideo == 1'b1) 
+      scandoubler_disable <= ~scandoubler_disable;
+end
+
+wire [17:0] vduRGB, rgbSD;
+
+zxuno_video zxunoVideo
+(
+	.clk_sys     (clk28    ),
+	.scanlines   (2'b00),
+	.ce_divider  (1'b0       ),
+	.R           (vduRGB[17:12]),
+	.G           (vduRGB[11: 6]),
+	.B           (vduRGB[ 5: 0]),
+	.HSync       (~vduHs     ),
+	.VSync       (~vduVs     ),
+	.VGA_R       (rgbSD[17:12] ),
+	.VGA_G       (rgbSD[11: 6] ),
+	.VGA_B       (rgbSD[ 5: 0] ),
+	.VGA_VS      (sync[1]    ),
+	.VGA_HS      (hsyncaux    ),
+	.scandoubler_disable(scandoubler_disable)
+);
+assign vduHs = hsync;
+assign vduVs = vsync;
+
+assign sync[0] = hsyncaux;
+
+
+
 //-------------------------------------------------------------------------------------------------
 
 wire[7:0] spdQ;
@@ -244,6 +294,28 @@ wire[7:0] psgA2;
 wire[7:0] psgB2;
 wire[7:0] psgC2;
 
+`ifdef ZXD
+audio Audio_i2s
+(
+	.clock  (clock  ),
+   .clock50(clock50s),
+	.reset  (reset  ),
+	.speaker(speaker),
+	.mic    (mic    ),
+	.ear    (ear    ),
+	.spd    (spdQ   ),
+	.a1     (psgA1  ),
+	.b1     (psgB1  ),
+	.c1     (psgC1  ),
+	.a2     (psgA2  ),
+	.b2     (psgB2  ),
+	.c2     (psgC2  ),
+   .i2s_bc (i2s_bclk_o),
+   .i2s_lc (i2s_lrclk_o),
+   .i2s_dt (i2s_data_o),
+	.audio  (audio  )
+);  
+`else
 audio Audio
 (
 	.clock  (clock  ),
@@ -260,6 +332,7 @@ audio Audio
 	.c2     (psgC2  ),
 	.audio  (audio  )
 );
+`endif
 
 //-------------------------------------------------------------------------------------------------
 
@@ -274,6 +347,7 @@ keyboard Keyboard
 	.f5     (keyF5  ),
 	.f11    (keyF11 ),
 	.f12    (keyF12 ),
+   .modovideo(keyModovideo),
 	.q      (keyQ   ),
 	.a      (keyA   )
 );
@@ -392,23 +466,33 @@ assign led = { 1'b1, usdCs };
 `endif
 
 //-------------------------------------------------------------------------------------------------
-assign hsyncaux = ~(hsync^vsync);
+//assign hsyncaux = ~(hsync^vsync);
 
 `ifdef ZX1
 assign stdn = 2'b01; // PAL
-assign sync = { 1'b1, hsyncaux };
-assign rgb = blank ? 9'd0 : { r,r&i,r, g,g&i,g, b,b&i,b };
+//assign sync = { 1'b1, hsyncaux };
+assign vduRGB = blank ? 17'd0 : { r,r&i,r, 3'b000, g,g&i,g, 3'b000, b,b&i,b, 3'b000 };
+assign rgb = { rgbSD[17:15], rgbSD[11:9], rgbSD[5:3] };
 `elsif ZX2
 reg[17:0] palette[15:0];
 initial $readmemh("palette.hex", palette, 0);
-assign sync = { 1'b1, hsyncaux };
-assign rgb = blank ? 18'd0 : palette[{ i, r, g, b }];
+//assign sync = { 1'b1, hsyncaux };
+assign vduRGB = blank ? 18'd0 : palette[{ i, r, g, b }];
+assign rgb = rgbSD;
 `elsif ZXD
 reg[17:0] palette[15:0];
 initial $readmemh("palette.hex", palette, 0);
-assign sync = { 1'b1, hsyncaux };
-assign rgb = blank ? 18'd0 : palette[{ i, r, g, b }];
+//assign sync = { 1'b1, hsyncaux };
+assign vduRGB = blank ? 18'd0 : palette[{ i, r, g, b }];
+assign rgb = rgbSD;
 `endif
+
+
+//------------multiboot---------------
+multiboot multiboot_i  (
+   .clk_icap(clk28    ),
+   .REBOOT  (~keyF11   )
+);
 
 //-------------------------------------------------------------------------------------------------
 endmodule

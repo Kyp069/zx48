@@ -69,7 +69,7 @@ module joydecoder (
 	assign hsref = hsync_n_s; 
   
   //Gestion de Joystick
-   reg [5:0] joy1  = 6'b111111, joy2  = 6'h111111;   // CB RLDU
+   reg [5:0] joy1  = 6'b111111, joy2  = 6'b111111;   // CB RLDU
    reg joy_renew = 1'b1;
    reg [4:0]joy_count = 5'd0;
    

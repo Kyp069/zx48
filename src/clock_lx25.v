@@ -4,7 +4,8 @@ module clock
 (
 	input  wire i50,   // 50.000 MHz
 	output wire o56,   // 56.000 MHz
-	output wire o16,   // 16.666 MHz	
+	output wire o16,   // 16.666 MHz
+   output wire o50,   // 50.000 MHz	
 	output wire locked
 );
 //-------------------------------------------------------------------------------------------------
@@ -42,12 +43,13 @@ Dcm
 );
 
 BUFGCE_1 Bufgce(.I(co), .O(o56), .CE(locked));
+BUFG bufgO50(.I(ci), .O(o50));
 
 // clock 16,66Mhz
 reg ce_16m;
 reg [1:0] div3 = 2'b0;
 
-always @(posedge ci) begin
+always @(posedge o50) begin
    if (div3 == 2'b10) begin
       div3 <= 2'b0;
       ce_16m <= 1'b1;
