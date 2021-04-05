@@ -1,131 +1,132 @@
-module multiboot (
-    input wire clk_icap,
-	 input wire REBOOT
-    );
-    
-`ifdef ZX1
-    reg [23:0] spi_addr = 24'h058000;  // default value lx9              
-`elsif ZX2
-    reg [23:0] spi_addr = 24'h098000;  // default value lx16
-`elsif ZXD
-    reg [23:0] spi_addr = 24'h0B0000;  // default value lx25
-`endif
-    reg [4:0] q = 5'b00000;
-    reg reboot_ff = 1'b0;
+//-------------------------------------------------------------------------------------------------
+module multiboot
+//-------------------------------------------------------------------------------------------------
+#
+(
+	parameter MODEL = 24'd0	// lx25 = 24'h0B0000, lx16 = 24'h098000
+)
+(
+	input wire clock,
+	input wire reboot
+);
+//-------------------------------------------------------------------------------------------------
 
-    always @(posedge clk_icap) begin
-      q[0] <= REBOOT;
-      q[1] <= q[0];
-      q[2] <= q[1];
-      q[3] <= q[2];
-      q[4] <= q[3];
-      reboot_ff <= (q[4] && (!q[3]) && (!q[2]) && (!q[1]) );
-    end
-	 
-    multiboot_spartan6 multiboot (
-        .CLK(clk_icap),
-        .MBT_RESET(1'b0),
-        .MBT_REBOOT(reboot_ff),
-        .spi_addr(spi_addr)
-    );
-endmodule            
-    
-module multiboot_spartan6 (
-    input wire CLK,
-    input wire MBT_RESET,
-    input wire MBT_REBOOT,
-    input wire [23:0] spi_addr
-  );
+reg[4:0] q;
+reg      ff;
 
-reg  [15:0] icap_din;
-reg         icap_ce;
-reg         icap_wr;
+always @(posedge clock)
+begin
+	q  <= { q[3:0], reboot };
+	ff <= q[4] && !q[3] && !q[2] && !q[1];
+end
 
-reg  [15:0] ff_icap_din_reversed;
-reg         ff_icap_ce;
-reg         ff_icap_wr;
+multiboot_spartan6 multiboot
+(
+	.clock (clock),
+	.reset (1'b0 ),
+	.reboot(ff   ),
+	.addr  (MODEL)
+);
 
+//-------------------------------------------------------------------------------------------------
+endmodule
+//-------------------------------------------------------------------------------------------------
 
-  ICAP_SPARTAN6 ICAP_SPARTAN6_inst (
-  
-    .CE        (ff_icap_ce),   // Clock enable input
-    .CLK       (CLK),         // Clock input
-    .I         (ff_icap_din_reversed),  // 16-bit data input
-    .WRITE     (ff_icap_wr)    // Write input
-  );
+module multiboot_spartan6
+(
+	input wire       clock,
+	input wire       reset,
+	input wire       reboot,
+	input wire[23:0] addr
+);
+
+reg[15:0] icap_din;
+reg       icap_ce;
+reg       icap_wr;
+
+reg[15:0] ff_icap_din;
+reg       ff_icap_ce;
+reg       ff_icap_wr;
+
+ICAP_SPARTAN6 ICAP_SPARTAN6_instance
+(
+	.CLK  (clock      ),
+	.CE   (ff_icap_ce ),
+	.I    (ff_icap_din),
+	.O    (           ),
+	.BUSY (           ),
+	.WRITE(ff_icap_wr )
+);
 
 //  -------------------------------------------------
 //  --  State Machine for ICAP_SPARTAN6 MultiBoot  --
 //  -------------------------------------------------
 
+parameter         IDLE     = 0,
+                  SYNC_H   = 1,
+                  SYNC_L   = 2,
 
-parameter         IDLE     = 0, 
-                  SYNC_H   = 1, 
-                  SYNC_L   = 2, 
-                  
-                  CWD_H    = 3,  
-                  CWD_L    = 4,  
-                                 
-                  GEN1_H   = 5,  
-                  GEN1_L   = 6,  
-                                 
-                  GEN2_H   = 7,  
-                  GEN2_L   = 8,  
-                                 
-                  GEN3_H   = 9,  
-                  GEN3_L   = 10, 
-                                 
-                  GEN4_H   = 11, 
-                  GEN4_L   = 12, 
-                                 
-                  GEN5_H   = 13, 
-                  GEN5_L   = 14, 
-                                 
-                  NUL_H    = 15, 
-                  NUL_L    = 16, 
-                                 
-                  MOD_H    = 17, 
-                  MOD_L    = 18, 
-                                 
-                  HCO_H    = 19, 
-                  HCO_L    = 20, 
-                                 
-                  RBT_H    = 21, 
-                  RBT_L    = 22, 
-                  
-                  NOOP_0   = 23, 
+                  CWD_H    = 3,
+                  CWD_L    = 4,
+
+                  GEN1_H   = 5,
+                  GEN1_L   = 6,
+
+                  GEN2_H   = 7,
+                  GEN2_L   = 8,
+
+                  GEN3_H   = 9,
+                  GEN3_L   = 10,
+
+                  GEN4_H   = 11,
+                  GEN4_L   = 12,
+
+                  GEN5_H   = 13,
+                  GEN5_L   = 14,
+
+                  NUL_H    = 15,
+                  NUL_L    = 16,
+
+                  MOD_H    = 17,
+                  MOD_L    = 18,
+
+                  HCO_H    = 19,
+                  HCO_L    = 20,
+
+                  RBT_H    = 21,
+                  RBT_L    = 22,
+
+                  NOOP_0   = 23,
                   NOOP_1   = 24,
                   NOOP_2   = 25,
                   NOOP_3   = 26;
-                  
-                   
+
 reg [4:0]     state;
 reg [4:0]     next_state;
-
 
 always @*
    begin: COMB
 
       case (state)
-      
+
          IDLE:
             begin
-               if (MBT_REBOOT)
+               if (reboot)
                   begin
                      next_state  = SYNC_H;
                      icap_ce     = 0;
                      icap_wr     = 0;
-                     icap_din    = 16'hAA99;  // Sync word 1 
+                     icap_din    = 16'hAA99;  // Sync word 1
                   end
                else
                   begin
                      next_state  = IDLE;
                      icap_ce     = 1;
                      icap_wr     = 1;
-                     icap_din    = 16'hFFFF;  // Null 
+                     icap_din    = 16'hFFFF;  // Null
                   end
             end
-            
+
          SYNC_H:
             begin
                next_state  = SYNC_L;
@@ -166,7 +167,7 @@ always @*
                next_state  = GEN2_H;
                icap_ce     = 0;
                icap_wr     = 0;
-               icap_din    = spi_addr[15:0]; //16'hC000;   //  dreccion SPI BAJA
+               icap_din    = addr[15:0]; //16'hC000;   //  dreccion SPI BAJA
             end
 
          GEN2_H:
@@ -179,12 +180,12 @@ always @*
 
         GEN2_L:
             begin
-               next_state  = MOD_H;
+               next_state  = NUL_L; //MOD_H;
                icap_ce     = 0;
                icap_wr     = 0;
-               icap_din    = {8'h03, spi_addr[23:16]}; // 16'h030A;   //  03 lectura SPI opcode + direccion SPI ALTA (03 = 1x, 6B = 4x)
+               icap_din    = {8'h03, addr[23:16]}; // 16'h030A;   //  03 lectura SPI opcode + direccion SPI ALTA (03 = 1x, 6B = 4x)
             end
-	
+
 ///////	Registro MODE (para carga a 4x tras reboot)
 
         MOD_H:
@@ -201,7 +202,7 @@ always @*
                icap_ce     = 0;
                icap_wr     = 0;
                icap_din    = 16'h2100; // Activamos bit de lectura a modo 4x en el proceso de Config
-            end				
+            end
 /////
 
         NUL_L:
@@ -263,7 +264,7 @@ always @*
                icap_wr     = 1;
                icap_din    = 16'h1111;    // NULL value
             end
-          
+
         default:
             begin
                next_state  = IDLE;
@@ -275,38 +276,37 @@ always @*
       endcase
    end
 
-always @(posedge CLK)
+always @(posedge clock)
 
    begin:   SEQ
-      if (MBT_RESET)
+      if (reset)
          state <= IDLE;
       else
          state <= next_state;
    end
 
 
-always @(posedge CLK)
+always @(posedge clock)
+begin: ICAP_FF
+	ff_icap_din[ 0] <= icap_din[ 7]; //need to reverse bits to ICAP module since D0 bit is read first
+	ff_icap_din[ 1] <= icap_din[ 6];
+	ff_icap_din[ 2] <= icap_din[ 5];
+	ff_icap_din[ 3] <= icap_din[ 4];
+	ff_icap_din[ 4] <= icap_din[ 3];
+	ff_icap_din[ 5] <= icap_din[ 2];
+	ff_icap_din[ 6] <= icap_din[ 1];
+	ff_icap_din[ 7] <= icap_din[ 0];
+	ff_icap_din[ 8] <= icap_din[15];
+	ff_icap_din[ 9] <= icap_din[14];
+	ff_icap_din[10] <= icap_din[13];
+	ff_icap_din[11] <= icap_din[12];
+	ff_icap_din[12] <= icap_din[11];
+	ff_icap_din[13] <= icap_din[10];
+	ff_icap_din[14] <= icap_din[ 9];
+	ff_icap_din[15] <= icap_din[ 8];
 
-   begin:   ICAP_FF
-   
-        ff_icap_din_reversed[0]  <= icap_din[7];   //need to reverse bits to ICAP module since D0 bit is read first
-        ff_icap_din_reversed[1]  <= icap_din[6]; 
-        ff_icap_din_reversed[2]  <= icap_din[5]; 
-        ff_icap_din_reversed[3]  <= icap_din[4]; 
-        ff_icap_din_reversed[4]  <= icap_din[3]; 
-        ff_icap_din_reversed[5]  <= icap_din[2]; 
-        ff_icap_din_reversed[6]  <= icap_din[1]; 
-        ff_icap_din_reversed[7]  <= icap_din[0]; 
-        ff_icap_din_reversed[8]  <= icap_din[15];
-        ff_icap_din_reversed[9]  <= icap_din[14];
-        ff_icap_din_reversed[10] <= icap_din[13];
-        ff_icap_din_reversed[11] <= icap_din[12];
-        ff_icap_din_reversed[12] <= icap_din[11];
-        ff_icap_din_reversed[13] <= icap_din[10];
-        ff_icap_din_reversed[14] <= icap_din[9]; 
-        ff_icap_din_reversed[15] <= icap_din[8]; 
-        
-        ff_icap_ce  <= icap_ce;
-        ff_icap_wr  <= icap_wr;
-   end       
+	ff_icap_ce  <= icap_ce;
+	ff_icap_wr  <= icap_wr;
+end
+
 endmodule

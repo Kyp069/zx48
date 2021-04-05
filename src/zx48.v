@@ -18,7 +18,7 @@ module zx48
 `elsif ZX2
 	output wire[ 1:0] led,
 `elsif ZXD
-	output wire[ 1:0] led,
+	output wire[ 0:0] led,
 `endif
 
 `ifdef ZX1
@@ -47,7 +47,7 @@ module zx48
    input  wire joyD,  //data
    output wire joyLd, //load
    output wire joyCk, //clock
-   input  wire joySl, //select   
+   input  wire joySl, //select
 `endif
 
 	output wire       usdCs,
@@ -57,15 +57,7 @@ module zx48
 
 `ifdef ZXD
 	// I2S -- Compartido con PI0
-   //output wire i2s_mclk_o,
-	output wire       i2s_bclk_o,
-	output wire       i2s_lrclk_o,
-	output wire       i2s_data_o,
-`endif
-
-`ifdef ZXD
-	// I2S -- Compartido con PI0
-   //output wire i2s_mclk_o,
+	// output wire i2s_mclk_o,
 	output wire       i2s_bclk_o,
 	output wire       i2s_lrclk_o,
 	output wire       i2s_data_o,
@@ -77,7 +69,7 @@ module zx48
 	output wire[20:0] sramA
 `elsif ZX2
 	//SRAM for BIOS configuration
-   output wire       sramWe,
+	output wire       sramWe,
 	inout  wire[ 7:0] sramDQ,
 	output wire[18:0] sramA,
    //SDRAM for main core
@@ -107,8 +99,8 @@ clock Clock
 	.i50    (clock50),
 	.o56    (clock  ),
 `ifdef ZXD
-   .o16    (clock16),
-   .o50    (clock50s),
+	.o16    (clock16),
+	.o50    (clock50s),
 `endif
 	.locked (locked )
 );
@@ -121,6 +113,16 @@ wire ce7M0n = locked & ~ce[0] & ~ce[1] & ~ce[2];
 
 wire ce3M5p = locked & ~ce[0] & ~ce[1] & ~ce[2] &  ce[3];
 wire ce3M5n = locked & ~ce[0] & ~ce[1] & ~ce[2] & ~ce[3];
+
+//-------------------------------------------------------------------------------------------------
+
+BUFG Bufg14(.I(ce[1]), .O(clock14));
+
+multiboot #(.MODEL(24'h0B0000)) Multiboot
+(
+	.clock  (clock14),
+	.reboot (keyF11 )
+);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -185,7 +187,7 @@ always @(posedge clock) if(ce7M0n) if(!ioFE && !wr) { speaker, mic, border } <= 
 wire[ 7:0] memQ;
 wire[ 7:0] vduQ;
 wire[12:0] vduA;
-wire[1:0] scndl_r; //valores bios de scandoubler
+wire[ 1:0] scndl_r; //valores bios de scandoubler
 
 memory Memory
 (
@@ -206,17 +208,17 @@ memory Memory
 	.vduCe  (ce7M0n ),
 	.vduQ   (vduQ   ),
 	.vduA   (vduA   ),
-   .scndbl  (scndl_r ),
+	.scndbl (scndl_r),
 `ifdef ZX1
-   .scndbl  (scndl_r ),
-	.sramWe  (sramWe  ),
-	.sramDQ  (sramDQ  ),
-	.sramA   (sramA   )
+	.scndbl (scndl_r),
+	.sramWe (sramWe ),
+	.sramDQ (sramDQ ),
+	.sramA  (sramA  )
 `elsif ZX2
 	//BIOS default configuration
-   .sramWe  (sramWe  ),
-	.sramDQ  (sramDQ  ),
-	.sramA   (sramA   )
+	.sramWe  (sramWe),
+	.sramDQ  (sramDQ),
+	.sramA   (sramA )
 //   //MAIN use
 //	.sdramCk (sdramCk ),
 //	.sdramCe (sdramCe ),
@@ -259,81 +261,6 @@ video Video
 	.a      (vduA   )
 );
 
-reg clk28 = 1'b0;
-always @(posedge clock) clk28 = ~ clk28;
-
-reg scandoubler_disable = 1'b0;
-reg keyMv_prev = 1'b1;
-always @(posedge clock) begin
-   keyMv_prev <= keyModovideo;
-   if (!power) scandoubler_disable <= ~scndl_r[0];
-   else if (keyMv_prev == 1'b0 && keyModovideo == 1'b1) 
-      scandoubler_disable <= ~scandoubler_disable;
-end
-
-wire [17:0] vduRGB, rgbSD;
-
-zxuno_video zxunoVideo
-(
-	.clk_sys     (clk28    ),
-	.scanlines   (2'b00),
-	.ce_divider  (1'b0       ),
-	.R           (vduRGB[17:12]),
-	.G           (vduRGB[11: 6]),
-	.B           (vduRGB[ 5: 0]),
-	.HSync       (~vduHs     ),
-	.VSync       (~vduVs     ),
-	.VGA_R       (rgbSD[17:12] ),
-	.VGA_G       (rgbSD[11: 6] ),
-	.VGA_B       (rgbSD[ 5: 0] ),
-	.VGA_VS      (sync[1]    ),
-	.VGA_HS      (hsyncaux    ),
-	.scandoubler_disable(scandoubler_disable)
-);
-assign vduHs = hsync;
-assign vduVs = vsync;
-
-assign sync[0] = hsyncaux;
-
-
-
-reg clk28 = 1'b0;
-always @(posedge clock) clk28 = ~ clk28;
-
-reg scandoubler_disable = 1'b0;
-reg keyMv_prev = 1'b1;
-always @(posedge clock) begin
-   keyMv_prev <= keyModovideo;
-   if (!power) scandoubler_disable <= ~scndl_r[0];
-   else if (keyMv_prev == 1'b0 && keyModovideo == 1'b1) 
-      scandoubler_disable <= ~scandoubler_disable;
-end
-
-wire [17:0] vduRGB, rgbSD;
-
-zxuno_video zxunoVideo
-(
-	.clk_sys     (clk28    ),
-	.scanlines   (2'b00),
-	.ce_divider  (1'b0       ),
-	.R           (vduRGB[17:12]),
-	.G           (vduRGB[11: 6]),
-	.B           (vduRGB[ 5: 0]),
-	.HSync       (~vduHs     ),
-	.VSync       (~vduVs     ),
-	.VGA_R       (rgbSD[17:12] ),
-	.VGA_G       (rgbSD[11: 6] ),
-	.VGA_B       (rgbSD[ 5: 0] ),
-	.VGA_VS      (sync[1]    ),
-	.VGA_HS      (hsyncaux    ),
-	.scandoubler_disable(scandoubler_disable)
-);
-assign vduHs = hsync;
-assign vduVs = vsync;
-
-assign sync[0] = hsyncaux;
-
-
 //-------------------------------------------------------------------------------------------------
 
 wire[7:0] spdQ;
@@ -362,11 +289,11 @@ audio Audio_i2s
 	.a2     (psgA2  ),
 	.b2     (psgB2  ),
 	.c2     (psgC2  ),
-   .i2s_bc (i2s_bclk_o),
-   .i2s_lc (i2s_lrclk_o),
-   .i2s_dt (i2s_data_o),
+	.i2s_bc (i2s_bclk_o),
+	.i2s_lc (i2s_lrclk_o),
+	.i2s_dt (i2s_data_o),
 	.audio  (audio  )
-);  
+);
 `else
 audio Audio
 (
@@ -399,7 +326,7 @@ keyboard Keyboard
 	.f5     (keyF5  ),
 	.f11    (keyF11 ),
 	.f12    (keyF12 ),
-   .modovideo(keyModovideo),
+	.scrlk  (scrlk  ),
 	.q      (keyQ   ),
 	.a      (keyA   )
 );
@@ -529,11 +456,42 @@ assign led = ~usdCs;
 `elsif ZX2
 assign led = { 1'b1, usdCs };
 `elsif ZXD
-assign led = { 1'b1, usdCs };
+assign led = usdCs;
 `endif
 
 //-------------------------------------------------------------------------------------------------
-//assign hsyncaux = ~(hsync^vsync);
+
+reg clock28;
+always @(posedge clock) clock28 <= ~clock28;
+
+reg scandoubler_disable;
+reg keyMv_prev = 1'b1;
+
+always @(posedge clock) begin
+	keyMv_prev <= scrlk;
+	if(!power) scandoubler_disable <= ~scndl_r[0]; else if(!keyMv_prev && scrlk) scandoubler_disable <= ~scandoubler_disable;
+end
+
+wire[17:0] vduRGB;
+wire[17:0] rgbSD;
+
+zxuno_video zxunoVideo
+(
+	.clk_sys     (clock28      ),
+	.scanlines   (2'b00        ),
+	.ce_divider  (1'b0         ),
+	.R           (vduRGB[17:12]),
+	.G           (vduRGB[11: 6]),
+	.B           (vduRGB[ 5: 0]),
+	.HSync       (~hsync       ),
+	.VSync       (~vsync       ),
+	.VGA_R       (rgbSD[17:12] ),
+	.VGA_G       (rgbSD[11: 6] ),
+	.VGA_B       (rgbSD[ 5: 0] ),
+	.VGA_VS      (sync[1]      ),
+	.VGA_HS      (sync[0]      ),
+	.scandoubler_disable(scandoubler_disable)
+);
 
 `ifdef ZX1
 assign stdn = 2'b01; // PAL
@@ -553,20 +511,6 @@ initial $readmemh("palette.hex", palette, 0);
 assign vduRGB = blank ? 18'd0 : palette[{ i, r, g, b }];
 assign rgb = rgbSD;
 `endif
-
-
-//------------multiboot---------------
-multiboot multiboot_i  (
-   .clk_icap(clk28    ),
-   .REBOOT  (~keyF11   )
-);
-
-
-//------------multiboot---------------
-multiboot multiboot_i  (
-   .clk_icap(clk28    ),
-   .REBOOT  (~keyF11   )
-);
 
 //-------------------------------------------------------------------------------------------------
 endmodule

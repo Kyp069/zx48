@@ -22,16 +22,16 @@ module memory
 	input  wire       vduCe,
 	output wire[ 7:0] vduQ,
 	input  wire[12:0] vduA,
-   output wire[1:0]  scndbl,   //configuración de bios de scandoubler 
+	output wire[ 1:0] scndbl,   //configuración de bios de scandoubler 
 
 `ifdef ZX1
-   output wire[1:0]  scndbl,   //configuración de bios de scandoubler 
+	output wire[ 1:0] scndbl,   //configuración de bios de scandoubler 
 	output wire       sramWe,
 	inout  wire[ 7:0] sramDQ,
 	output wire[20:0] sramA
 `elsif ZX2
 	//BIOS default configuration
-   output wire       sramWe,
+	output wire       sramWe,
 	inout  wire[ 7:0] sramDQ,
 	output wire[18:0] sramA
 //   //Main use
@@ -202,14 +202,14 @@ assign q = a[15:13] == 3'b000 && map && !mapram ? esxQ : a[15:14] == 2'b00 && !m
 `elsif ZXD
 assign ready = power;
 assign sramOe = 1'b0;
-assign sramUb = 1'b1;
+assign sramUb = 1'b0;
 assign sramLb = 1'b0;
 
 assign sramWe = !(!mreq && !wr && (a[15] || a[14] || (a[13] && map)));
-assign sramDQ = sramWe ? 16'hZZZZ : { 8'hFF, d };
+assign sramDQ = sramWe ? 16'hZZZZ : {2{d}};
 assign sramA = power ? { 2'b00, a[15:14] == 2'b00 && map ? { 1'b1, page, a[12:0] } : { 2'b00, a } }
                : 21'h08FD5 ; //magic place where the scandoubler settings have been stored
-assign q = a[15:13] == 3'b000 && map && !mapram ? esxQ : a[15:14] == 2'b00 && !map ? romQ : sramDQ[7:0];
+assign q = a[15:13] == 3'b000 && map && !mapram ? esxQ : a[15:14] == 2'b00 && !map ? romQ : sramDQ[15:8];
 `endif
 
 //BIOS default value load

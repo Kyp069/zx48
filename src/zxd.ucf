@@ -9,8 +9,7 @@ TIMESPEC "TS_clock50"=PERIOD "clock50" 20.0 ns HIGH 50%;
 
 # Led #############################################################################################
 
-#NET led<1>      LOC="R9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST; # D3
-NET led<1>                  IOSTANDARD=LVCMOS33 | SLEW=FAST; # D3 - Compartido con i2s
+#ET led<1>      LOC="R9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST; # D3 - Compartido con i2s
 NET led<0>      LOC="T9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST; # D1
 
 # Video ###########################################################################################
@@ -44,6 +43,12 @@ NET ear         LOC="A14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
 NET audio<1>    LOC="H13" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # right
 NET audio<0>    LOC="H11" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # left
 
+# I2S #############################################################################################
+
+NET i2s_bclk_o  LOC="R9"  | IOSTANDARD=LVTTL | DRIVE=4 | PULLUP; # shared with PI0 and D3
+NET i2s_lrclk_o LOC="A13" | IOSTANDARD=LVTTL | DRIVE=4 | PULLUP; # shared with PI0
+NET i2s_data_o  LOC="B12" | IOSTANDARD=LVTTL | DRIVE=4 | PULLUP; # shared with PI0
+
 # PS/2 ############################################################################################
 
 NET keyb<1>     LOC="P12" | IOSTANDARD=LVCMOS33 | SLEW=FAST | PULLUP; # data
@@ -51,6 +56,13 @@ NET keyb<0>     LOC="M11" | IOSTANDARD=LVCMOS33 | SLEW=FAST | PULLUP; # clock
 
 #ET mouse<1>    LOC="P11" | IOSTANDARD=LVCMOS33 | SLEW=FAST | PULLUP; # data
 #ET mouse<0>    LOC="M10" | IOSTANDARD=LVCMOS33 | SLEW=FAST | PULLUP; # clock
+
+# # Joystick ######################################################################################
+# 
+NET joyD        LOC="T13" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # data
+NET joyLd       LOC="T12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # load
+NET joyCk       LOC="R12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # clock
+NET joySl       LOC="C9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST; # select
 
 # uSD #############################################################################################
 
@@ -107,17 +119,6 @@ NET sramA<0>    LOC="H14" | IOSTANDARD=LVCMOS33 | SLEW=FAST;
 
 ###################################################################################################
 
-# # Joystick ########################################################################################
-# 
-NET joyD        LOC="T13" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # data
-NET joyLd       LOC="T12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # load
-NET joyCk       LOC="R12" | IOSTANDARD=LVCMOS33 | SLEW=FAST; # clock
-NET joySl       LOC="C9" | IOSTANDARD=LVCMOS33 | SLEW=FAST;  # select
-
-#I2S output
-NET i2s_bclk_o        LOC="R9"    | IOSTANDARD = LVTTL | DRIVE = 4 | PULLUP; #Comparte pin con PI0
-NET i2s_lrclk_o       LOC="A13"    | IOSTANDARD = LVTTL | DRIVE = 4 | PULLUP; #Comparte pin con PI0
-NET i2s_data_o        LOC="B12"    | IOSTANDARD = LVTTL | DRIVE = 4 | PULLUP; #Comparte pin con PI0
 
 
 # SPI Flash
