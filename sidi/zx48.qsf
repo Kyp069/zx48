@@ -1,0 +1,212 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 2017  Intel Corporation. All rights reserved.
+# Your use of Intel Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Intel Program License 
+# Subscription Agreement, the Intel Quartus Prime License Agreement,
+# the Intel FPGA IP License Agreement, or other applicable license
+# agreement, including, without limitation, that your use is for
+# the sole purpose of programming logic devices manufactured by
+# Intel and sold by Intel or its authorized distributors.  Please
+# refer to the applicable agreement for further details.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus Prime
+# Version 17.1.0 Build 590 10/25/2017 SJ Lite Edition
+# Date created = 17:16:05  April 22, 2021
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		zx48_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Altera recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus Prime software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+
+# Project-Wide Assignments
+# ========================
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 17.1.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "16:21:26  SEPTEMBER 18, 2020"
+set_global_assignment -name LAST_QUARTUS_VERSION "17.1.0 Lite Edition"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
+
+# Pin & Location Assignments
+# ==========================
+set_location_assignment PIN_E1 -to clock27
+set_location_assignment PIN_G1 -to led
+set_location_assignment PIN_T10 -to sync[1]
+set_location_assignment PIN_T11 -to sync[0]
+set_location_assignment PIN_P16 -to rgb[17]
+set_location_assignment PIN_P15 -to rgb[16]
+set_location_assignment PIN_R16 -to rgb[15]
+set_location_assignment PIN_R14 -to rgb[14]
+set_location_assignment PIN_T15 -to rgb[13]
+set_location_assignment PIN_T14 -to rgb[12]
+set_location_assignment PIN_F16 -to rgb[11]
+set_location_assignment PIN_F15 -to rgb[10]
+set_location_assignment PIN_L16 -to rgb[9]
+set_location_assignment PIN_L15 -to rgb[8]
+set_location_assignment PIN_N15 -to rgb[7]
+set_location_assignment PIN_N16 -to rgb[6]
+set_location_assignment PIN_J16 -to rgb[5]
+set_location_assignment PIN_J15 -to rgb[4]
+set_location_assignment PIN_J14 -to rgb[3]
+set_location_assignment PIN_K16 -to rgb[2]
+set_location_assignment PIN_K15 -to rgb[1]
+set_location_assignment PIN_J13 -to rgb[0]
+set_location_assignment PIN_P1 -to ear
+set_location_assignment PIN_T12 -to dsgR
+set_location_assignment PIN_T13 -to dsgL
+set_location_assignment PIN_R4 -to sdramCk
+set_location_assignment PIN_C11 -to sdramCe
+set_location_assignment PIN_B11 -to sdramCs
+set_location_assignment PIN_D8 -to sdramWe
+set_location_assignment PIN_A10 -to sdramRas
+set_location_assignment PIN_B10 -to sdramCas
+set_location_assignment PIN_C9 -to sdramDQM[1]
+set_location_assignment PIN_C8 -to sdramDQM[0]
+set_location_assignment PIN_A2 -to sdramDQ[15]
+set_location_assignment PIN_A3 -to sdramDQ[14]
+set_location_assignment PIN_B3 -to sdramDQ[13]
+set_location_assignment PIN_A5 -to sdramDQ[12]
+set_location_assignment PIN_B5 -to sdramDQ[11]
+set_location_assignment PIN_B6 -to sdramDQ[10]
+set_location_assignment PIN_C6 -to sdramDQ[9]
+set_location_assignment PIN_E6 -to sdramDQ[8]
+set_location_assignment PIN_B7 -to sdramDQ[7]
+set_location_assignment PIN_A7 -to sdramDQ[6]
+set_location_assignment PIN_D6 -to sdramDQ[5]
+set_location_assignment PIN_A6 -to sdramDQ[4]
+set_location_assignment PIN_B4 -to sdramDQ[3]
+set_location_assignment PIN_A4 -to sdramDQ[2]
+set_location_assignment PIN_C2 -to sdramDQ[1]
+set_location_assignment PIN_C3 -to sdramDQ[0]
+set_location_assignment PIN_B12 -to sdramBA[1]
+set_location_assignment PIN_A11 -to sdramBA[0]
+set_location_assignment PIN_D14 -to sdramA[12]
+set_location_assignment PIN_D15 -to sdramA[11]
+set_location_assignment PIN_B13 -to sdramA[10]
+set_location_assignment PIN_D16 -to sdramA[9]
+set_location_assignment PIN_A12 -to sdramA[8]
+set_location_assignment PIN_A13 -to sdramA[7]
+set_location_assignment PIN_A14 -to sdramA[6]
+set_location_assignment PIN_A15 -to sdramA[5]
+set_location_assignment PIN_B16 -to sdramA[4]
+set_location_assignment PIN_C16 -to sdramA[3]
+set_location_assignment PIN_C15 -to sdramA[2]
+set_location_assignment PIN_C14 -to sdramA[1]
+set_location_assignment PIN_B14 -to sdramA[0]
+set_location_assignment PIN_T3 -to spiCk
+set_location_assignment PIN_R1 -to spiDi
+set_location_assignment PIN_T2 -to spiDo
+set_location_assignment PIN_H2 -to cfgD0
+set_location_assignment PIN_T4 -to spiS2
+set_location_assignment PIN_G15 -to spiS3
+
+# Classic Timing Assignments
+# ==========================
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
+
+# Analysis & Synthesis Assignments
+# ================================
+set_global_assignment -name FAMILY "Cyclone IV E"
+set_global_assignment -name TOP_LEVEL_ENTITY zx48
+
+# Fitter Assignments
+# ==================
+set_global_assignment -name DEVICE EP4CE22F17C8
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
+set_global_assignment -name STRATIXV_CONFIGURATION_SCHEME "PASSIVE SERIAL"
+set_global_assignment -name CRC_ERROR_OPEN_DRAIN OFF
+set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name ENABLE_CONFIGURATION_PINS OFF
+set_global_assignment -name ENABLE_BOOT_SEL_PIN OFF
+set_global_assignment -name RESERVE_DATA0_AFTER_CONFIGURATION "USE AS REGULAR IO"
+
+# Assembler Assignments
+# =====================
+set_global_assignment -name ENABLE_OCT_DONE OFF
+set_global_assignment -name USE_CONFIGURATION_DEVICE OFF
+set_global_assignment -name GENERATE_RBF_FILE ON
+
+# Power Estimation Assignments
+# ============================
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+
+# Advanced I/O Timing Assignments
+# ===============================
+set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -rise
+set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -fall
+set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -rise
+set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -fall
+
+# ------------------
+# start ENTITY(zx48)
+
+	# start DESIGN_PARTITION(Top)
+	# ---------------------------
+
+		# Incremental Compilation Assignments
+		# ===================================
+		set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+		set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+		set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+
+	# end DESIGN_PARTITION(Top)
+	# -------------------------
+
+# end ENTITY(zx48)
+# ----------------
+set_global_assignment -name SDC_FILE zx48.sdc
+set_global_assignment -name VERILOG_FILE ../src/mister/osd.v
+set_global_assignment -name VERILOG_FILE ../src/spi.v
+set_global_assignment -name VERILOG_FILE ../src/audio.v
+set_global_assignment -name VERILOG_FILE ../src/JT49/jt49_noise.v
+set_global_assignment -name VERILOG_FILE ../src/JT49/jt49_exp.v
+set_global_assignment -name VERILOG_FILE ../src/JT49/jt49_eg.v
+set_global_assignment -name VERILOG_FILE ../src/JT49/jt49_div.v
+set_global_assignment -name VERILOG_FILE ../src/JT49/jt49_cen.v
+set_global_assignment -name VERILOG_FILE ../src/JT49/jt49_bus.v
+set_global_assignment -name VERILOG_FILE ../src/JT49/jt49.v
+set_global_assignment -name VHDL_FILE ../src/T80/T80pa.vhd
+set_global_assignment -name VHDL_FILE ../src/T80/T80_Reg.vhd
+set_global_assignment -name VHDL_FILE ../src/T80/T80_Pack.vhd
+set_global_assignment -name VHDL_FILE ../src/T80/T80_MCode.vhd
+set_global_assignment -name VHDL_FILE ../src/T80/T80_ALU.vhd
+set_global_assignment -name VHDL_FILE ../src/T80/T80.vhd
+set_global_assignment -name VERILOG_FILE ../src/video.v
+set_global_assignment -name VERILOG_FILE ../src/usd.v
+set_global_assignment -name VERILOG_FILE ../src/turbosound.v
+set_global_assignment -name VERILOG_FILE ../src/specdrum.v
+set_global_assignment -name VERILOG_FILE ../src/rom.v
+set_global_assignment -name VERILOG_FILE ../src/keyboard.v
+set_global_assignment -name VERILOG_FILE ../src/dprs.v
+set_global_assignment -name VERILOG_FILE ../src/cpu.v
+set_global_assignment -name VERILOG_FILE ../src/main.v
+set_global_assignment -name VERILOG_FILE ../src/scandoubler.v
+set_global_assignment -name VERILOG_FILE ../src/sdram.v
+set_global_assignment -name VERILOG_FILE ../src/memory.v
+set_global_assignment -name VERILOG_FILE ../src/dac.v
+set_global_assignment -name VERILOG_FILE ../src/mister/user_io.v
+set_global_assignment -name VERILOG_FILE ../src/mister/sd_card.v
+set_global_assignment -name SYSTEMVERILOG_FILE zx48.sv
+set_global_assignment -name QIP_FILE clock.qip
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

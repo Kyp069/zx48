@@ -16,8 +16,8 @@ module video
 	output wire       i,
 
 	output wire       bi,
-	output wire       rd,
 	output wire       cn,
+	output wire       rd,
 
 	input  wire[ 7:0] d,
 	output wire[12:0] a
@@ -83,7 +83,7 @@ assign i = attrOutput[6];
 //-------------------------------------------------------------------------------------------------
 
 assign bi = !(vCount == 248 && hCount >= 2 && hCount <= 65);
-assign cn = (hCount[3] || hCount[2]) && dataEnable;
+assign cn = |hCount[3:2] && dataEnable;
 assign rd = hCount[3] && dataEnable;
 
 assign a = { !hCount[1] ? { vCount[7:6], vCount[2:0] } : { 3'b110, vCount[7:6] }, vCount[5:3], hCount[7:4], hCount[2] };

@@ -13,13 +13,14 @@ module usd
 	output wire[7:0] q,
 	input  wire[7:0] a,
 
-	output reg       cs = 1'b1,
+	output reg       cs,
 	output wire      ck,
 	input  wire      miso,
 	output wire      mosi
 );
 //-------------------------------------------------------------------------------------------------
 
+initial cs = 1'b1;
 always @(posedge clock) if(cep) if(!iorq && !wr && a == 8'hE7) cs <= d[0];
 
 //-------------------------------------------------------------------------------------------------

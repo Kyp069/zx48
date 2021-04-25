@@ -3,22 +3,20 @@ module sdram
 //-------------------------------------------------------------------------------------------------
 (
 	input  wire       clock,
-	input  wire       power,
+	input  wire       reset,
 	output reg        ready,
 
-	input  wire       rfsh,
-	input  wire       rd,
-	input  wire       wr,
-	input  wire[15:0] d,
-	output reg [15:0] q,
-	input  wire[23:0] a,
+	input  wire       refresh,
+	input  wire       write,
+	input  wire       read,
+	input  wire[15:0] portD,
+	output reg [15:0] portQ,
+	input  wire[23:0] portA,
 
-	output wire       sdramCk,
-	output wire       sdramCe,
 	output reg        sdramCs,
-	output reg        sdramWe,
 	output reg        sdramRas,
 	output reg        sdramCas,
+	output reg        sdramWe,
 	output reg [ 1:0] sdramDQM,
 	inout  wire[15:0] sdramDQ,
 	output reg [ 1:0] sdramBA,
@@ -28,23 +26,31 @@ module sdram
 `include "sdram_cmd.v"
 //-------------------------------------------------------------------------------------------------
 
-reg rfsh1, rfsh2;
-reg rd1, rd2;
-reg wr1, wr2;
+assign sdramDQ = sdramWe ? 16'bZ : portD;
+
+//-----------------------------------------------------------------------------
+
+reg rs = 1'b0, rs2 = 1'b0;
+reg rd = 1'b0, rd2 = 1'b0;
+reg wr = 1'b0, wr2 = 1'b0;
+reg rf = 1'b0, rf2 = 1'b0;
 
 always @(negedge clock)
 begin
-	rfsh1 <= rfsh;
-	rfsh2 <= !rfsh && rfsh1;
+	rs2 <= reset;
+	rs  <= !reset && rs2;
 
-	rd1 <= rd;
-	rd2 <= !rd && rd1;
+	rd2 <= read;
+	rd  <= !read && rd2;
 
-	wr1 <= wr;
-	wr2 <= !wr && wr1;
+	wr2 <= write;
+	wr  <= !write && wr2;
+
+	rf2 <= refresh;
+	rf  <= !refresh && rf2;
 end
 
-//-------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 localparam sINIT = 0;
 localparam sIDLE = 1;
@@ -52,16 +58,16 @@ localparam sREAD = 2;
 localparam sWRITE = 3;
 localparam sREFRESH = 4;
 
-reg counting;
-reg[4:0] count;
-reg[2:0] state;
+reg counting = 1'b0;
+reg[5:0] count = 1'd0;
+reg[2:0] state = 1'd0;
 
 always @(posedge clock)
-if(!power) state <= sINIT;
+if(rs) state <= sINIT;
 else
 begin
-	NOP;												// default state is NOP
-	if(counting) count <= count+5'd1; else count <= 5'd0;
+	NOP;														// default state is NOP
+	if(counting) count <= count+1'd1; else count <= 1'd0;
 
 	case(state)
 	sINIT:
@@ -70,28 +76,34 @@ begin
 
 		case(count)
 		 0: ready <= 1'b0;
-		 8: PRECHARGE(1'b1);							//  8    PRECHARGE: all, tRP's minimum value is 20ns
-		12: REFRESH;									// 11    REFRESH, tRFC's minimum value is 66ns
-		20: REFRESH;									// 20    REFRESH, tRFC's minimum value is 66ns
-		28: LMR(13'b000_1_00_010_0_000);				// 29    LDM: CL = 2, BT = seq, BL = 1, wait 2T
-		31: begin ready <= 1'b1; state <= sIDLE; end
+		 8: PRECHARGE(1'b1);									// PRECHARGE: all, tRP's minimum value is 20ns
+		16: REFRESH;											// REFRESH, tRFC's minimum value is 60ns
+		24: REFRESH;											// REFRESH, tRFC's minimum value is 60ns
+		32: LMR(13'b000_1_00_010_0_000);						// LDM: CL = 2, BT = seq, BL = 1, 20ns
+		63:
+		begin
+			ready <= 1'b1;
+			state <= sIDLE;
+		end
 		endcase
 	end
 	sIDLE:
 	begin
 		counting <= 1'b0;
 
-		if(rfsh2) begin REFRESH; state <= sREFRESH; end else
-		if(wr2)   begin ACTIVE(a[23:22], a[21:9]); state <= sWRITE; end else
-		if(rd2)   begin ACTIVE(a[23:22], a[21:9]); state <= sREAD; end
+		if(rd) state <= sREAD; else
+		if(wr) state <= sWRITE; else
+		if(rf) state <= sREFRESH;
 	end
 	sREAD:
 	begin
 		counting <= 1'b1;
 
 		case(count)
-		0: READ(2'b00, 2'b00, a[8:0], 1'b1);
-		2: begin q <= sdramDQ; state <= sIDLE; end
+		0: ACTIVE(portA[23:22], portA[21:9]);
+		3: READ(2'b00, 2'b00, portA[8:0], 1'b1);
+		6: portQ <= sdramDQ;
+		7: state <= sIDLE;
 		endcase
 	end
 	sWRITE:
@@ -99,39 +111,21 @@ begin
 		counting <= 1'b1;
 
 		case(count)
-		0: WRITE(2'b00, 2'b00, a[8:0], 1'b1);
-		2: state <= sIDLE;
+		0: ACTIVE(portA[23:22], portA[21:9]);
+		3: WRITE(2'b00, 2'b00, portA[8:0], 1'b1);
+		7: state <= sIDLE;
 		endcase
 	end
 	sREFRESH:
 	begin
 		counting <= 1'b1;
-
 		case(count)
-		2: state <= sIDLE;
+		1: REFRESH;
+		7: state <= sIDLE;
 		endcase
 	end
 	endcase
 end
-
-//-------------------------------------------------------------------------------------------------
-
-ODDR2 oddr2
-(
-	.Q       (sdramCk), // 1-bit DDR output data
-	.C0      ( clock ), // 1-bit clock input
-	.C1      (~clock ), // 1-bit clock input
-	.CE      (1'b1   ), // 1-bit clock enable input
-	.D0      (1'b1   ), // 1-bit data input (associated with C0)
-	.D1      (1'b0   ), // 1-bit data input (associated with C1)
-	.R       (1'b0   ), // 1-bit reset input
-	.S       (1'b0   )  // 1-bit set input
-);
-
-//-------------------------------------------------------------------------------------------------
-
-assign sdramCe = 1'b1;
-assign sdramDQ = sdramWe ? 16'bZ : d;
 
 //-------------------------------------------------------------------------------------------------
 endmodule
