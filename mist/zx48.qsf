@@ -1,0 +1,182 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 1991-2013 Altera Corporation
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, Altera MegaCore Function License 
+# Agreement, or other applicable license agreement, including, 
+# without limitation, that your use is for the sole purpose of 
+# programming logic devices manufactured by Altera and sold by 
+# Altera or its authorized distributors.  Please refer to the 
+# applicable agreement for further details.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus II 64-Bit
+# Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Full Version
+# Date created = 16:37:18  May 01, 2021
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		zx48_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Altera recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus II software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+set_global_assignment -name FAMILY "Cyclone III"
+set_global_assignment -name DEVICE EP3C25E144C8
+set_global_assignment -name TOP_LEVEL_ENTITY zx48
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION "13.0 SP1"
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "16:37:18  MAY 01, 2021"
+set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name DEVICE_FILTER_PIN_COUNT 144
+set_global_assignment -name DEVICE_FILTER_SPEED_GRADE 8
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name USE_CONFIGURATION_DEVICE OFF
+set_global_assignment -name GENERATE_RBF_FILE ON
+set_global_assignment -name CRC_ERROR_OPEN_DRAIN OFF
+set_global_assignment -name RESERVE_DATA1_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_FLASH_NCE_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -rise
+set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -fall
+set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -rise
+set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -fall
+# Pin & Location Assignments
+# ==========================
+set_location_assignment PIN_54 -to clock27
+set_location_assignment PIN_7 -to led
+set_location_assignment PIN_136 -to sync[1]
+set_location_assignment PIN_119 -to sync[0]
+set_location_assignment PIN_144 -to rgb[17]
+set_location_assignment PIN_143 -to rgb[16]
+set_location_assignment PIN_142 -to rgb[15]
+set_location_assignment PIN_141 -to rgb[14]
+set_location_assignment PIN_137 -to rgb[13]
+set_location_assignment PIN_135 -to rgb[12]
+set_location_assignment PIN_114 -to rgb[11]
+set_location_assignment PIN_113 -to rgb[10]
+set_location_assignment PIN_112 -to rgb[9]
+set_location_assignment PIN_111 -to rgb[8]
+set_location_assignment PIN_110 -to rgb[7]
+set_location_assignment PIN_106 -to rgb[6]
+set_location_assignment PIN_133 -to rgb[5]
+set_location_assignment PIN_132 -to rgb[4]
+set_location_assignment PIN_125 -to rgb[3]
+set_location_assignment PIN_121 -to rgb[2]
+set_location_assignment PIN_120 -to rgb[1]
+set_location_assignment PIN_115 -to rgb[0]
+set_location_assignment PIN_31 -to ear
+set_location_assignment PIN_65 -to dsgR
+set_location_assignment PIN_80 -to dsgL
+set_location_assignment PIN_43 -to sdramCk
+set_location_assignment PIN_33 -to sdramCe
+set_location_assignment PIN_59 -to sdramCs
+set_location_assignment PIN_66 -to sdramWe
+set_location_assignment PIN_60 -to sdramRas
+set_location_assignment PIN_64 -to sdramCas
+set_location_assignment PIN_85 -to sdramDqm[1]
+set_location_assignment PIN_67 -to sdramDqm[0]
+set_location_assignment PIN_104 -to sdramDQ[15]
+set_location_assignment PIN_103 -to sdramDQ[14]
+set_location_assignment PIN_101 -to sdramDQ[13]
+set_location_assignment PIN_100 -to sdramDQ[12]
+set_location_assignment PIN_99 -to sdramDQ[11]
+set_location_assignment PIN_98 -to sdramDQ[10]
+set_location_assignment PIN_87 -to sdramDQ[9]
+set_location_assignment PIN_86 -to sdramDQ[8]
+set_location_assignment PIN_68 -to sdramDQ[7]
+set_location_assignment PIN_69 -to sdramDQ[6]
+set_location_assignment PIN_71 -to sdramDQ[5]
+set_location_assignment PIN_72 -to sdramDQ[4]
+set_location_assignment PIN_76 -to sdramDQ[3]
+set_location_assignment PIN_77 -to sdramDQ[2]
+set_location_assignment PIN_79 -to sdramDQ[1]
+set_location_assignment PIN_83 -to sdramDQ[0]
+set_location_assignment PIN_51 -to sdramBA[1]
+set_location_assignment PIN_58 -to sdramBA[0]
+set_location_assignment PIN_32 -to sdramA[12]
+set_location_assignment PIN_30 -to sdramA[11]
+set_location_assignment PIN_50 -to sdramA[10]
+set_location_assignment PIN_28 -to sdramA[9]
+set_location_assignment PIN_11 -to sdramA[8]
+set_location_assignment PIN_10 -to sdramA[7]
+set_location_assignment PIN_8 -to sdramA[6]
+set_location_assignment PIN_6 -to sdramA[5]
+set_location_assignment PIN_4 -to sdramA[4]
+set_location_assignment PIN_39 -to sdramA[3]
+set_location_assignment PIN_42 -to sdramA[2]
+set_location_assignment PIN_44 -to sdramA[1]
+set_location_assignment PIN_49 -to sdramA[0]
+set_location_assignment PIN_126 -to spiCk
+set_location_assignment PIN_88 -to spiDi
+set_location_assignment PIN_105 -to spiDo
+set_location_assignment PIN_13 -to cfgD0
+set_location_assignment PIN_127 -to spiS2
+set_location_assignment PIN_91 -to spiS3
+
+set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "2.5 V"
+set_global_assignment -name VERILOG_INPUT_VERSION VERILOG_2001
+set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/mister/user_io.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/mister/sd_card.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/mister/osd.v
+set_global_assignment -name VHDL_FILE //VBOXSVR/MiSTica/zx48/src/T80/T80pa.vhd
+set_global_assignment -name VHDL_FILE //VBOXSVR/MiSTica/zx48/src/T80/T80_Reg.vhd
+set_global_assignment -name VHDL_FILE //VBOXSVR/MiSTica/zx48/src/T80/T80_Pack.vhd
+set_global_assignment -name VHDL_FILE //VBOXSVR/MiSTica/zx48/src/T80/T80_MCode.vhd
+set_global_assignment -name VHDL_FILE //VBOXSVR/MiSTica/zx48/src/T80/T80_ALU.vhd
+set_global_assignment -name VHDL_FILE //VBOXSVR/MiSTica/zx48/src/T80/T80.vhd
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/JT49/jt49_noise.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/JT49/jt49_exp.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/JT49/jt49_eg.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/JT49/jt49_div.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/JT49/jt49_cen.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/JT49/jt49_bus.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/JT49/jt49.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/video.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/usd.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/turbosound.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/spi.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/specdrum.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/sdram.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/scandoubler.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/rom.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/ram.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/ps2.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/memory.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/main.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/keyboard.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/joystick.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/i2s.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/dprs.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/dprf.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/dac.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/cpu.v
+set_global_assignment -name VERILOG_FILE //VBOXSVR/MiSTica/zx48/src/audio.v
+set_global_assignment -name SDC_FILE //VBOXSVR/MiSTica/zx48/mist/zx48.sdc
+set_global_assignment -name QIP_FILE //VBOXSVR/MiSTica/zx48/mist/clock.qip
+set_global_assignment -name RESERVE_DATA0_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DCLK_AFTER_CONFIGURATION "COMPILER CONFIGURED"
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
