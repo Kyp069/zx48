@@ -63,10 +63,10 @@ NET keybDQ      LOC="P12" | IOSTANDARD=LVCMOS33 | SLEW=FAST | PULLUP ; # data
 
 # Joystick ########################################################################################
 
-#ET joySl       LOC="C9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST ; # select
-#ET joyCk       LOC="R12" | IOSTANDARD=LVCMOS33 | SLEW=FAST ; # clock
-#ET joyLd       LOC="T12" | IOSTANDARD=LVCMOS33 | SLEW=FAST ; # load
-#ET joyD        LOC="T13" | IOSTANDARD=LVCMOS33 | SLEW=FAST ; # data
+NET joySl       LOC="C9"  | IOSTANDARD=LVCMOS33 | SLEW=FAST ; # select
+NET joyCk       LOC="R12" | IOSTANDARD=LVCMOS33 | SLEW=FAST ; # clock
+NET joyLd       LOC="T12" | IOSTANDARD=LVCMOS33 | SLEW=FAST ; # load
+NET joyD        LOC="T13" | IOSTANDARD=LVCMOS33 | SLEW=FAST ; # data
 
 # uSD #############################################################################################
 

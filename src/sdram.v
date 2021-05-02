@@ -75,12 +75,12 @@ begin
 		counting <= 1'b1;
 
 		case(count)
-		 0: ready <= 1'b0;
-		16: PRECHARGE(1'b1);									// PRECHARGE: all, tRP's minimum value is 20ns
-		32: REFRESH;											// REFRESH, tRFC's minimum value is 60ns
-		48: REFRESH;											// REFRESH, tRFC's minimum value is 60ns
-		64: LMR(13'b000_1_00_010_0_000);					// LDM: CL = 2, BT = seq, BL = 1, 20ns
-	  127:
+		  0: ready <= 1'b0;
+		 16: PRECHARGE(1'b1);									// PRECHARGE: all, tRP's minimum value is 20ns
+		 32: REFRESH;											// REFRESH, tRFC's minimum value is 60ns
+		 48: REFRESH;											// REFRESH, tRFC's minimum value is 60ns
+		 64: LMR(13'b000_1_00_010_0_000);						// LDM: CL = 2, BT = seq, BL = 1, 20ns
+		127:
 		begin
 			ready <= 1'b1;
 			state <= sIDLE;

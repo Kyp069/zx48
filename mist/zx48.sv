@@ -38,7 +38,7 @@ clock Clock
 (
 	.inclk0 (clock27), // 27.000 MHz input
 	.c0     (clock  ), // 56.000 MHz output
-	.c1	  (clk_sdr), // 56.000 Mhz output -90º phase shift
+	.c1	    (clk_sdr), // 56.000 Mhz output -90º phase shift
 	.locked (locked )  // 56.000 MHz output
 );
 
@@ -75,8 +75,8 @@ wire nmi = F5 && ~status[1];
 wire[11:0] laudio;
 wire[11:0] raudio;
 
-wire[7:0] joy1 = 8'd0;
-wire[7:0] joy2 = 8'd0;
+wire[7:0] joy1 = { 2'b00, joystick_0[5:0] };
+wire[7:0] joy2 = { 2'b00, joystick_1[5:0] };
 
 wire[ 7:0] ramD;
 wire[ 7:0] ramQ = sdrQ[7:0];

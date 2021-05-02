@@ -17,6 +17,11 @@ module zx48
 	inout  wire       keybCk,
 	inout  wire       keybDQ,
 
+	output wire       joySl,
+	output wire       joyCk,
+	output wire       joyLd,
+	input  wire       joyD,
+
 	output wire       usdCs,
 	output wire       usdCk,
 	input  wire       usdMiso,
@@ -103,14 +108,28 @@ if(kstb)
 
 //-------------------------------------------------------------------------------------------------
 
+wire[7:0] joy1;
+wire[7:0] joy2;
+
+joystick Joystick
+(
+	.clock  (clock  ),
+	.ce     (ne7M0  ),
+	.joy1   (joy1   ),
+	.joy2   (joy2   ),
+	.joySl  (joySl  ),
+	.joyCk  (joyCk  ),
+	.joyLd  (joyLd  ),
+	.joyD   (joyD   )
+);
+
+//-------------------------------------------------------------------------------------------------
+
 wire reset = power & ready & F12 & (ctrl|alt|del);
 wire nmi = F5;
 
 wire[11:0] laudio;
 wire[11:0] raudio;
-
-wire[7:0] joy1 = 8'd0;
-wire[7:0] joy2 = 8'd0;
 
 wire[ 7:0] ramD;
 wire[ 7:0] ramQ = sdrQ[7:0];

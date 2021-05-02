@@ -74,8 +74,8 @@ wire nmi = F5 && ~status[1];
 wire[11:0] laudio;
 wire[11:0] raudio;
 
-wire[7:0] joy1 = 8'd0;
-wire[7:0] joy2 = 8'd0;
+wire[7:0] joy1 = { 2'b00, joystick_0[5:0] };
+wire[7:0] joy2 = { 2'b00, joystick_1[5:0] };
 
 wire[ 7:0] ramD;
 wire[ 7:0] ramQ = sdrQ[7:0];
